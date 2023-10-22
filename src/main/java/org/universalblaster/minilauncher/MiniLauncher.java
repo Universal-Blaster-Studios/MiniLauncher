@@ -17,7 +17,7 @@ public class MiniLauncher {
     public static final Logger logger = LogManager.getLogger(MiniLauncher.class);
 
     public static void main(String[] args) {
-        logger.info("Welcome to " + MiniLauncher.class);
+        logger.info("Welcome to MiniLauncher.");
         if (isHeadless()) {
             logger.info("Headless environment, proceeding...");
             System.out.println("This is a headless environment!");

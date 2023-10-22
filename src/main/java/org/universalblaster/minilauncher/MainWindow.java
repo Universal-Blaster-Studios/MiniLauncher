@@ -185,8 +185,8 @@ public class MainWindow extends javax.swing.JFrame {
             if (index != -1) {
                 String item = lstDir.getModel().getElementAt(index);
                 System.out.println("Double-clicked on: " + item);
-                String newPath = txtPath.getText();
-                if (new File(newPath).isDirectory()) {
+                String newPath = txtPath.getText(); 
+                if (new File(newPath + File.separator + item).isDirectory()) {
                     if (!newPath.endsWith(File.separator)) {
                         newPath += File.separator;
                     }
@@ -201,23 +201,27 @@ public class MainWindow extends javax.swing.JFrame {
     private void searchPath(File path) {
         DefaultListModel<String> mdl = new DefaultListModel<>();
         int size = 0;
+        int filecount = 0;
+        int dircount = 0;
         File curDir = path;
         File[] dircontents = curDir.listFiles();
         if (dircontents != null) {
             for (int i = 0; i < dircontents.length; i++) {
                 if (dircontents[i].isDirectory()) {
-                    System.out.println(dircontents[i].getName() + "\t" + i);
                     mdl.add(size, dircontents[i].getName() + File.separatorChar);
                     size++;
+                    dircount++;
                 }
             }
+            MiniLauncher.logger.info("Identified " + dircount + " directories.");
             for (int i = 0; i < dircontents.length; i++) {
                 if (dircontents[i].isFile()) {
-                    System.out.println(dircontents[i].getName() + "\t" + i);
                     mdl.add(size, "[File]   " + dircontents[i].getName());
                     size++;
+                    filecount++;
                 }
             }
+            MiniLauncher.logger.info("Identified " + filecount + " files.");
             lstDir.setEnabled(true);
         } else {
             mdl.add(0, "The path is not valid, or directory is empty!");
