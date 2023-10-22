@@ -1,0 +1,3 @@
+[submodule "src/main/modrinth-api-packages"]
+	path = src/main/modrinth-api-packages
+	url = https://github.com/Universal-Blaster-Studios/modrinth-api-packages
