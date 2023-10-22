@@ -6,18 +6,20 @@ package org.universalblaster.minilauncher;
 
 import java.io.File;
 import javax.swing.DefaultListModel;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  *
  * @author Luke {@literal <luke.m@universalblaster.org>}
  */
 public class MainWindow extends javax.swing.JFrame {
-
+    
     /**
      * Creates new form MainWindow
      */
     public MainWindow() {
         initComponents();
+        searchPath(new File(System.getProperty("user.home")));
     }
 
     /**
@@ -47,11 +49,6 @@ public class MainWindow extends javax.swing.JFrame {
 
         jTabbedPane1.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        lstDir.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         lstDir.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         lstDir.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -60,7 +57,7 @@ public class MainWindow extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(lstDir);
 
-        txtConfigName.setText("myModpack.conf");
+        txtConfigName.setText("myModpack.mlcfg");
 
         btnCreate.setMnemonic('r');
         btnCreate.setText("Create config file");
@@ -200,28 +197,42 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void searchPath(File path) {
         DefaultListModel<String> mdl = new DefaultListModel<>();
-        int size = 0;
-        int filecount = 0;
-        int dircount = 0;
+        int size = 0, dircount = 0, filecount = 0;
+        boolean hasConfigFile = false;
+        String configName = "";
         File curDir = path;
         File[] dircontents = curDir.listFiles();
         if (dircontents != null) {
-            for (int i = 0; i < dircontents.length; i++) {
-                if (dircontents[i].isDirectory()) {
-                    mdl.add(size, dircontents[i].getName() + File.separatorChar);
+            for (File dircontent : dircontents) {
+                if (dircontent.isDirectory()) {
+                    mdl.add(size, dircontent.getName() + File.separatorChar);
                     size++;
                     dircount++;
                 }
             }
             MiniLauncher.logger.info("Identified " + dircount + " directories.");
-            for (int i = 0; i < dircontents.length; i++) {
-                if (dircontents[i].isFile()) {
-                    mdl.add(size, "[File]   " + dircontents[i].getName());
+            
+            for (File dircontent : dircontents) {
+                if (dircontent.isFile()) {
+                    mdl.add(size, "[File]   " + dircontent.getName());
                     size++;
                     filecount++;
                 }
+                if (FilenameUtils.getExtension(dircontent.getName()).equals("mlcfg")) {
+                    MiniLauncher.logger.info("Found a minilauncher file!");
+                    hasConfigFile = true;
+                    configName = dircontent.getName();                    
+                }
             }
             MiniLauncher.logger.info("Identified " + filecount + " files.");
+            
+            if (hasConfigFile) {
+                btnCreate.setText("Modify config file");
+                txtConfigName.setText(configName);
+            } else {
+                btnCreate.setText("Create config file");
+            }
+            
             lstDir.setEnabled(true);
         } else {
             mdl.add(0, "The path is not valid, or directory is empty!");
