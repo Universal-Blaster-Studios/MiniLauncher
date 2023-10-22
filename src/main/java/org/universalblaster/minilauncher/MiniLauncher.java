@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
 
 /**
  *
- * @author Luke
+ * @author Luke {@literal <luke.m@universalblaster.org>}
  */
 public class MiniLauncher {
     

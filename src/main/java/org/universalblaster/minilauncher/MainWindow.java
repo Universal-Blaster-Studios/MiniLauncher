@@ -9,7 +9,7 @@ import javax.swing.DefaultListModel;
 
 /**
  *
- * @author Luke
+ * @author Luke {@literal <luke.m@universalblaster.org>}
  */
 public class MainWindow extends javax.swing.JFrame {
 
@@ -53,6 +53,11 @@ public class MainWindow extends javax.swing.JFrame {
             public String getElementAt(int i) { return strings[i]; }
         });
         lstDir.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        lstDir.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lstDirMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(lstDir);
 
         txtConfigName.setText("myModpack.conf");
@@ -171,15 +176,38 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        searchPath(new File(txtPath.getText()));
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void lstDirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstDirMouseClicked
+        if (evt.getClickCount() == 2) { // Check for double-click
+            int index = lstDir.locationToIndex(evt.getPoint());
+            if (index != -1) {
+                String item = lstDir.getModel().getElementAt(index);
+                System.out.println("Double-clicked on: " + item);
+                String newPath = txtPath.getText();
+                if (new File(newPath).isDirectory()) {
+                    if (!newPath.endsWith(File.separator)) {
+                        newPath += File.separator;
+                    }
+                    newPath += item;
+                    txtPath.setText(newPath);
+                    searchPath(new File(newPath));
+                }
+            }
+        }
+    }//GEN-LAST:event_lstDirMouseClicked
+
+    private void searchPath(File path) {
         DefaultListModel<String> mdl = new DefaultListModel<>();
         int size = 0;
-        File curDir = new File(txtPath.getText());
+        File curDir = path;
         File[] dircontents = curDir.listFiles();
         if (dircontents != null) {
             for (int i = 0; i < dircontents.length; i++) {
                 if (dircontents[i].isDirectory()) {
                     System.out.println(dircontents[i].getName() + "\t" + i);
-                    mdl.add(size, dircontents[i].getName() + "/");
+                    mdl.add(size, dircontents[i].getName() + File.separatorChar);
                     size++;
                 }
             }
@@ -190,12 +218,14 @@ public class MainWindow extends javax.swing.JFrame {
                     size++;
                 }
             }
+            lstDir.setEnabled(true);
         } else {
-            mdl.add(0, "The path is not valid!");
+            mdl.add(0, "The path is not valid, or directory is empty!");
+            lstDir.setEnabled(false);
         }
         lstDir.setModel(mdl);
-    }//GEN-LAST:event_btnSearchActionPerformed
-
+    }
+    
     /**
      * @param args the command line arguments
      */
