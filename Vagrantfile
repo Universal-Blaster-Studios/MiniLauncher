@@ -44,10 +44,14 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  config.vm.synced_folder ".", "/vagrant"#,
-  #  type: "nfs",
-  #  nfs_version: 4,
-  #  nfs_udp: false
+  config.vm.synced_folder ".", "/vagrant"
+
+  config.vm.provider "libvirt" do |lv|
+    config.vm.synced_folder ".", "/vagrant",
+    type: "nfs",
+    nfs_version: 4,
+    nfs_udp: false
+  end
 
   # Disable the default share of the current code directory. Doing this
   # provides improved isolation between the vagrant box and your host
