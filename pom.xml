@@ -64,6 +64,7 @@
                 <version>1.1.1</version>
                 <executions>
                     <execution>
+                        <?m2e execute onConfiguration,onIncremental?>
                         <id>rust-build-id</id>
                         <goals>
                             <goal>build</goal>
