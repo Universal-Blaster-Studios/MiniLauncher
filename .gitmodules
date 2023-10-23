@@ -1,4 +1,4 @@
-[submodule "src/main/modrinth-api-packages"]
-	path = src/main/modrinth-api-packages
-  url = https://github.com/Universal-Blaster-Studios/modrinth-api-packages
-  branch = main
+[submodule "src/main/rust/modrinth-api-packages"]
+	path = src/main/rust/modrinth-api-packages
+	url = https://github.com/Universal-Blaster-Studios/modrinth-api-packages.git
+	branch = main
