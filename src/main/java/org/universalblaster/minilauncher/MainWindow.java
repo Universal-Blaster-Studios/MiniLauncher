@@ -5,6 +5,10 @@
 package org.universalblaster.minilauncher;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import org.apache.commons.io.FilenameUtils;
 
@@ -19,7 +23,7 @@ public class MainWindow extends javax.swing.JFrame {
      */
     public MainWindow() {
         initComponents();
-        searchPath(new File(System.getProperty("user.home")));
+        populateList(new File(System.getProperty("user.home")));
     }
 
     /**
@@ -49,11 +53,22 @@ public class MainWindow extends javax.swing.JFrame {
         jPanel7 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        txtPackName = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        txtPackAuthor = new javax.swing.JTextField();
+        txtPackVersion = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("MiniLauncher");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jTabbedPane1.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -105,6 +120,11 @@ public class MainWindow extends javax.swing.JFrame {
 
         btnCreate.setMnemonic('r');
         btnCreate.setText("Create config file");
+        btnCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateActionPerformed(evt);
+            }
+        });
 
         lstDir.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -225,15 +245,53 @@ public class MainWindow extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Mods", jPanel3);
 
+        jLabel3.setText("Modpack Name");
+
+        txtPackName.setText("My Modpack");
+
+        jLabel4.setText("Modpack Author");
+
+        txtPackAuthor.setText("Joe Soap");
+
+        txtPackVersion.setText("1.0");
+
+        jLabel5.setText("Modpack Version");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 628, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(txtPackName, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtPackAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(0, 112, Short.MAX_VALUE))
+                    .addComponent(txtPackVersion))
+                .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 437, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtPackName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtPackAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtPackVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(387, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Configuration", jPanel4);
@@ -286,7 +344,7 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        searchPath(new File(txtPath.getText()));
+        populateList(new File(txtPath.getText()));
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void lstDirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstDirMouseClicked
@@ -294,7 +352,6 @@ public class MainWindow extends javax.swing.JFrame {
             int index = lstDir.locationToIndex(evt.getPoint());
             if (index != -1) {
                 String item = lstDir.getModel().getElementAt(index);
-                System.out.println("Double-clicked on: " + item);
                 String newPath = txtPath.getText(); 
                 if (new File(newPath + File.separator + item).isDirectory()) {
                     if (!newPath.endsWith(File.separator)) {
@@ -302,19 +359,37 @@ public class MainWindow extends javax.swing.JFrame {
                     }
                     newPath += item;
                     txtPath.setText(newPath);
-                    searchPath(new File(newPath));
+                    populateList(new File(newPath));
                 }
             }
         }
     }//GEN-LAST:event_lstDirMouseClicked
 
-    private void searchPath(File path) {
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        new SplashScreen().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_formWindowClosing
+
+    private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
+        File fl = new File(txtPath.getText() + File.separator + txtConfigName.getText());
+        try {
+            FileWriter fw = new FileWriter(fl);
+            fw.write("packname:=" + txtPackName.getText() + "\n");
+            fw.write("packauth:=" + txtPackAuthor.getText() + "\n");
+            fw.write("packver:=" + txtPackVersion.getText() + "\n");
+            fw.flush();
+            fw.close();
+        } catch (IOException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnCreateActionPerformed
+
+    private void populateList(File path) {
         DefaultListModel<String> mdl = new DefaultListModel<>();
         int size = 0, dircount = 0, filecount = 0;
         boolean hasConfigFile = false;
         String configName = "";
-        File curDir = path;
-        File[] dircontents = curDir.listFiles();
+        File[] dircontents = FSTools.searchPath(path);
         if (dircontents != null) {
             for (File dircontent : dircontents) {
                 if (dircontent.isDirectory()) {
@@ -396,6 +471,9 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -409,6 +487,9 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JTree jTree1;
     private javax.swing.JList<String> lstDir;
     private javax.swing.JTextField txtConfigName;
+    private javax.swing.JTextField txtPackAuthor;
+    private javax.swing.JTextField txtPackName;
+    private javax.swing.JTextField txtPackVersion;
     private javax.swing.JTextField txtPath;
     // End of variables declaration//GEN-END:variables
 }

@@ -23,7 +23,7 @@ public class MiniLauncher {
             System.out.println("This is a headless environment!");
         } else {
             logger.info("Graphical environment, proceeding...");
-            new MainWindow().setVisible(true);
+            new SplashScreen().setVisible(true);
         }
     }
     

@@ -46,12 +46,12 @@ Vagrant.configure("2") do |config|
   # config.vm.synced_folder "../data", "/vagrant_data"
   config.vm.synced_folder ".", "/vagrant"
 
-  config.vm.provider "libvirt" do |lv|
-    config.vm.synced_folder ".", "/vagrant",
-    type: "nfs",
-    nfs_version: 4,
-    nfs_udp: false
-  end
+  #config.vm.provider "libvirt" do
+  #  config.vm.synced_folder ".", "/vagrant",
+  #  type: "nfs",
+  #  nfs_version: 4,
+  #  nfs_udp: false
+  #end
 
   # Disable the default share of the current code directory. Doing this
   # provides improved isolation between the vagrant box and your host
